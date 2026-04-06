@@ -52,7 +52,7 @@ This MCP server is optimized for standard tabular structures, strictly adhering 
 
 ```python
 # installation
-git clone https://github.com/khanabdullah9/distilgpt2-nifty50.git
+git clone https://github.com/khanabdullah9/Excel-MCP.git
 uv init
 uv add -r requirements.txt
 
