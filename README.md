@@ -1,9 +1,9 @@
 # 🎸 FluxSheet - MCP Server for Excel Interaction
 
 ## 📌 Overview
-This project is an **MCP (Model Context Protocol) server** that enables **Natural Language Models (NLMs)** to interact directly with **local Excel (XL) files**.
+This project is an **MCP (Model Context Protocol) server** that enables **Large Language Models (NLMs)** to interact directly with **local Excel files**.
 
-It leverages the open-source library **Excel Wings** to perform **real-time data operations on Excel files**, even when they are actively open. This allows seamless automation, manipulation, and querying of spreadsheet data using natural language.
+It leverages the open-source library **xlwings** to perform **real-time data operations on Excel files**, even when they are actively open. This allows seamless automation, manipulation, and querying of spreadsheet data using natural language.
 
 This MCP server is optimized for standard tabular structures, strictly adhering to the conventional **vertical column and horizontal row orientation**.
 
@@ -17,14 +17,12 @@ This MCP server is optimized for standard tabular structures, strictly adhering 
   Read/write data even when the Excel file is open.
 
 - ✍️ **Real-Time Data Writing**  
-  Uses *Excel Wings* to update spreadsheets without locking issues.
+  Uses *xlwings* to update spreadsheets without locking issues.
 
 - 🔄 **Data Manipulation**  
   Perform operations like:
   - Insert / update rows
   - Modify cell values
-  - Aggregate data
-  - Filter and transform datasets
 
 - ⚡ **MCP Server Architecture**  
   Acts as a bridge between language models and local file systems.
@@ -47,5 +45,15 @@ This MCP server is optimized for standard tabular structures, strictly adhering 
 ## 📦 Core libraries
 - [Python MCP SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [xlwings](https://github.com/xlwings/xlwings)
+
+---
+
+## ⚙️ Installation
+
+```python
+# installation
+git clone https://github.com/khanabdullah9/distilgpt2-nifty50.git
+uv init
+uv add -r requirements.txt
 
 
