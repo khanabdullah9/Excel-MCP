@@ -5,9 +5,40 @@ from utils import log
 import pandas as pd
 import os
 from plot_charts import *
+from file_handling import file_already_exists
 
 mcp = FastMCP("Excel-Automation")
 current_file_name = "main.py"
+
+@mcp.tool()
+@mcp.resource("file://{file_name}/{sheet_name}")
+def get_table_schema(file_name: str, sheet_name: str = "Sheet1") -> list[str]:
+    """Retrieves the schema of the table.
+    Args:
+        file_name (str): excel file name
+        sheet_name (str, optional): excel sheet name. Defaults to "Sheet1".
+
+    Returns:
+        list[str]: list of column names
+    """
+    if not file_already_exists(file_name=file_name):
+        return []
+
+    try:
+        wb = xw.Book(file_name)
+        sheet = wb.sheets[sheet_name]
+
+        # Instead of using .options(pd.DataFrame...)
+        data = sheet.range("A1").expand("table").value
+
+        if data:
+            # Use the first row as columns, the rest as data
+            df = pd.DataFrame(data[1:], columns=data[0])
+            return df.columns.tolist()
+        
+    except Exception as err:
+        log(f"{current_file_name} {err}")
+    return []
 
 @mcp.tool()
 def write_data_live(file_name: str, data: dict, sheet_name: str = "Sheet1") -> bool:
@@ -20,12 +51,11 @@ def write_data_live(file_name: str, data: dict, sheet_name: str = "Sheet1") -> b
     Args:
         file_name (str): Name of the output file
         data (dict): User's raw input data
-        sheet_name (str, optional): Spreadsheet name. Defaults to "Sheet1".
-        mode (str, optional): (append/write). Defaults to "append".
+        sheet_name (str, optional): Spreadsheet name. Defaults to "Sheet1"
     Returns:
         bool: Acknowledgement whether the process was successful
     """
-    df_new, mode = data_preprocess(file_name, sheet_name, data)
+    df_new = data_preprocess(file_name, sheet_name, data)
 
     try:
         wb = xw.Book(file_name)
@@ -33,10 +63,48 @@ def write_data_live(file_name: str, data: dict, sheet_name: str = "Sheet1") -> b
 
         last_row = sheet.range("A" + str(sheet.cells.last_cell.row)).end('up').row
         
-        if mode == "write":
-            sheet.range("A1").options(index = True).value = df_new
-        else:
-            sheet.range(f"A{last_row + 1}").options(index=True, header=True).value = df_new
+        # if mode == "write":
+        #     sheet.range("A1").options(index = True).value = df_new
+        # else:
+        #     sheet.range(f"A{last_row + 1}").options(index=True, header=True).value = df_new
+
+        sheet.range("A1").options(index = True).value = df_new
+        
+        wb.save()
+        return True
+    except Exception as err:
+        log(f"{current_file_name} {err}")
+        return False
+    
+@mcp.tool()
+def append_data_live(file_name: str, data: dict, sheet_name: str = "Sheet1") -> bool:
+    """Append data to an Excel file even if it is currently open in Excel.
+        The 'data' argument will be converted to a pandas dataframe.
+            Required format: {
+                        column_name: list[object]
+                        }
+
+    Args:
+        file_name (str): Name of the output file
+        data (dict): User's raw input data
+        sheet_name (str, optional): Spreadsheet name. Defaults to "Sheet1".
+    Returns:
+        bool: Acknowledgement whether the process was successful
+    """
+    df_new = data_preprocess(file_name, sheet_name, data)
+
+    try:
+        wb = xw.Book(file_name)
+        sheet = wb.sheets[sheet_name]
+
+        last_row = sheet.range("A" + str(sheet.cells.last_cell.row)).end('up').row
+        
+        # if mode == "write":
+        #     sheet.range("A1").options(index = True).value = df_new
+        # else:
+        #     sheet.range(f"A{last_row + 1}").options(index=True, header=True).value = df_new
+
+        sheet.range(f"A{last_row + 1}").options(index=True, header=True).value = df_new
         
         wb.save()
         return True

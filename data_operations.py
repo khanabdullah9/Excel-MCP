@@ -36,7 +36,7 @@ def data_preprocess(file_name: str, sheet_name: str, data: dict) -> tuple[pd.Dat
 
     existing_data = get_data(file_name=file_name, sheet_name = sheet_name)
     if existing_data.empty:
-        return df_new, "write"
+        return df_new
 
     merged = df_new.merge(
         existing_data, 
@@ -47,7 +47,7 @@ def data_preprocess(file_name: str, sheet_name: str, data: dict) -> tuple[pd.Dat
 
     df_final = merged[merged['_merge'] == 'left_only'].drop(columns=['_merge'])
 
-    return df_final, "append"
+    return df_final
 
 def update_row(row: pd.Series, data: dict) -> pd.Series:
     new_row = row.copy()
